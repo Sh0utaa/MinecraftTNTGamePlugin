@@ -1,5 +1,6 @@
 package me.shotatevdorashvili.minecraftTntGamePlugin.CommandExecutors;
 
+import me.shotatevdorashvili.minecraftTntGamePlugin.Listeners.ArenaBlockListener;
 import me.shotatevdorashvili.minecraftTntGamePlugin.Listeners.ArenaProtectionListener;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -9,17 +10,21 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 public class TntArenaCommand implements CommandExecutor {
     private final ArenaProtectionListener protectionListener;
+    private final Plugin plugin;
 
-    public TntArenaCommand(ArenaProtectionListener protectionListener) {
+    public TntArenaCommand(ArenaProtectionListener protectionListener, Plugin plugin) {
         this.protectionListener = protectionListener;
+        this.plugin = plugin;
     }
-
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
+
+
         if(!(commandSender instanceof Player)) {
             commandSender.sendMessage("Only Players can use this command!");
             return true;
@@ -67,6 +72,7 @@ public class TntArenaCommand implements CommandExecutor {
             }
         }
 
+        plugin.getServer().getPluginManager().registerEvents(new ArenaBlockListener(y, height), plugin);
         player.sendMessage("§aTNT Arena created!");
         return true;
     }
