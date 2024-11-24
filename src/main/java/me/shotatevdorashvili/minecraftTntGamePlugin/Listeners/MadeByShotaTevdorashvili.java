@@ -12,6 +12,6 @@ public class MadeByShotaTevdorashvili implements Listener {
     public void onJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
 
-        e.setJoinMessage(ChatColor.WHITE + "This Plugis was made by " + ChatColor.DARK_RED + "Shota Tevdorashvili " + ChatColor.DARK_PURPLE + " https://github.com/Sh0utaa/MinecraftTntGamePlugin");
+        e.setJoinMessage(ChatColor.WHITE + "This Plugis was made by " + ChatColor.GOLD + "Shota Tevdorashvili " + ChatColor.GOLD + " https://github.com/Sh0utaa/MinecraftTntGamePlugin");
     }
 }
