@@ -32,88 +32,16 @@ public class ArenaFillListener implements Listener {
         Block placedBlock = event.getBlock();
         int topY = arenaBaseY + arenaHeight - 1; // Y-level of the top layer
 
-// Check if the placed block is within the top layer
+        // Check if the placed block is within the top layer
         if (placedBlock.getY() == topY && isWithinArena(placedBlock.getLocation())) {
             if (isTopLayerFilled()) {
 
                 // Top layer is completely filled — trigger your action here
                 Player player = event.getPlayer();
+                startCountdown(player, 15, 20, plugin);
 
-                // Start the countdown task
-                new BukkitRunnable() {
-                    int countdown = 15; // Start countdown from 15 seconds
-                    int period = 20;    // Initial delay (1 second)
-                    boolean topLayerFilled = true; // To track the top layer state
-
-                    @Override
-                    public void run() {
-                        // Start a new task to continuously check if the top layer is filled
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                if (!isTopLayerFilled()) {
-                                    topLayerFilled = false; // Stop the countdown if top layer is no longer filled
-                                }
-                            }
-                        }.runTaskTimer(plugin, 0L, 20L); // Check every second (20 ticks)
-
-                        if (countdown >= 0 && topLayerFilled) {
-                            // Continue countdown only if top layer is still filled
-                            player.sendTitle(ChatColor.RED + "Countdown: " + countdown, "", 0, 20, 0);
-                            player.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, 1.0f, 1.0f);
-
-                            // If countdown reaches 3, change the delay to 5 seconds (100 ticks)
-                            if (countdown == 3) {
-                                period = 100; // Change period to 100 ticks (5 seconds)
-                                this.cancel(); // Cancel current task to reschedule it with new period
-                                new BukkitRunnable() {
-                                    @Override
-                                    public void run() {
-                                        // Continue countdown with new period
-                                        if (!topLayerFilled) {
-                                            // If the top layer is no longer filled, stop the countdown
-                                            player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.0f, 1.0f);
-                                            player.sendTitle(ChatColor.RED + "Canceled!", "", 0, 70, 20);
-                                            this.cancel(); // Cancel the task
-                                            return; // Exit the method
-                                        }
-
-                                        // Display the countdown as the title
-                                        player.sendTitle(ChatColor.RED + "Countdown: " + countdown, "", 0, 20, 0);
-
-                                        // Play Sound Affect
-                                        player.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, 1.0f, 1.0f);
-
-                                        // When countdown reaches 0, trigger the function
-                                        if (countdown == 0) {
-                                            this.cancel(); // Stop the countdown task
-                                            onCountdownComplete(player); // Call the function you want to trigger
-                                        }
-
-                                        countdown--; // Decrease the countdown by 1 second
-                                    }
-                                }.runTaskTimer(plugin, period, 20L); // Reschedule with the new delay
-                            }
-
-                            // When the countdown reaches 0, trigger a function
-                            if (countdown == 0) {
-                                this.cancel(); // Stop the countdown task
-                                onCountdownComplete(player); // Call the function you want to trigger
-                            }
-
-                            countdown--; // Decrease the countdown by 1 second
-                        } else if (!topLayerFilled) {
-                            // Stop countdown and inform the player when the top layer is no longer filled
-                            player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.0f, 1.0f);
-                            player.sendTitle(ChatColor.RED + "Canceled!", "", 0, 70, 20);
-                            this.cancel(); // Cancel the task
-                        }
-                    }
-                }.runTaskTimer(plugin, 20L, 20L); // Run every 20 ticks (1 second initially)
             }
         }
-
-
     }
 
     // Your function that gets triggered when the countdown hits 0
@@ -122,6 +50,52 @@ public class ArenaFillListener implements Listener {
         player.sendMessage(ChatColor.GREEN + "Countdown Complete! Triggering function...");
         // You can add any function or event here, for example, starting a game, etc.
     }
+
+    public void startCountdown(Player player, int countdown, int delay, JavaPlugin plugin) {
+        // Display the starting countdown message
+        player.sendTitle(ChatColor.GREEN + "Starting countdown", "", 0, 20, 0);
+        player.playSound(player.getLocation(), Sound.BLOCK_VAULT_OPEN_SHUTTER, 1.0f, 1.0f); // Start sound
+        final int[] countdownArr = {countdown};
+
+        // Start the countdown task
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (countdownArr[0] >= 0) {
+                    if(countdownArr[0] <= 3) {
+                        this.cancel(); // Cancel the outer countdown task
+
+                        // Start a new task that counts down from 3 to 0
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                if (countdownArr[0] > 0) {
+                                    // Display the countdown number in red
+                                    player.sendTitle(ChatColor.RED + "" + countdownArr[0] + " sec", "", 0, 100, 100);
+                                    player.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, 1.0f, 1.0f); // Countdown sound
+
+                                    if (countdownArr[0] == 0) {
+                                        onCountdownComplete(player); // Call the function you want to trigger
+                                        this.cancel(); // Stop the countdown task
+                                    }
+
+                                    countdownArr[0]--;
+                                }
+                            }
+                        }.runTaskTimer(plugin, 100L, 100L); // Delay of 100 ticks for the inner countdown task
+                    }
+
+                    // Display the countdown number in red
+                    player.sendTitle(ChatColor.RED + "" + countdownArr[0] + " sec", "", 0, 20, 0);
+                    player.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, 1.0f, 1.0f); // Countdown sound
+
+                    countdownArr[0]--; // Only decrement here in the outer task
+                }
+            }
+        }.runTaskTimer(plugin, delay, delay); // Delay of 1 second (20 ticks)
+    }
+
+
 
     private boolean isWithinArena(Location location) {
         int startX = arenaLocation.getBlockX() - (arenaSize / 2);
