@@ -35,7 +35,7 @@ public class TntArenaCommand implements CommandExecutor {
         Location center = player.getLocation();
 
         int arenaSize = 16;
-        int height = 16;
+        int height = 17;
         int borderThickness = 1;
 
         // Calculate the starting corner
@@ -72,7 +72,9 @@ public class TntArenaCommand implements CommandExecutor {
             }
         }
 
-        plugin.getServer().getPluginManager().registerEvents(new ArenaBlockListener(y, height), plugin);
+        ArenaBlockListener arenaBlockListener = new ArenaBlockListener(y, center, arenaSize - 2, height);
+        plugin.getServer().getPluginManager().registerEvents(arenaBlockListener, plugin);
+
         player.sendMessage("§aTNT Arena created!");
         return true;
     }

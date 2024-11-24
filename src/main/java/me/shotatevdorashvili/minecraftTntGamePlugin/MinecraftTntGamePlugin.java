@@ -1,7 +1,6 @@
 package me.shotatevdorashvili.minecraftTntGamePlugin;
 
 import me.shotatevdorashvili.minecraftTntGamePlugin.CommandExecutors.TntArenaCommand;
-import me.shotatevdorashvili.minecraftTntGamePlugin.Listeners.ArenaBlockListener;
 import me.shotatevdorashvili.minecraftTntGamePlugin.Listeners.ArenaProtectionListener;
 import me.shotatevdorashvili.minecraftTntGamePlugin.Listeners.MadeByShotaTevdorashvili;
 import org.bukkit.plugin.java.JavaPlugin;
