@@ -1,6 +1,7 @@
 package me.shotatevdorashvili.minecraftTntGamePlugin.CommandExecutors;
 
 import me.shotatevdorashvili.minecraftTntGamePlugin.Listeners.ArenaBlockListener;
+import me.shotatevdorashvili.minecraftTntGamePlugin.Listeners.ArenaFillListener;
 import me.shotatevdorashvili.minecraftTntGamePlugin.Listeners.ArenaProtectionListener;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -73,7 +74,9 @@ public class TntArenaCommand implements CommandExecutor {
         }
 
         ArenaBlockListener arenaBlockListener = new ArenaBlockListener(y, center, arenaSize - 2, height);
+        ArenaFillListener arenaFillListener = new ArenaFillListener(y, center, arenaSize - 2, height);
         plugin.getServer().getPluginManager().registerEvents(arenaBlockListener, plugin);
+        plugin.getServer().getPluginManager().registerEvents(arenaFillListener, plugin);
 
         player.sendMessage("§aTNT Arena created!");
         return true;
