@@ -17,6 +17,6 @@ public final class MinecraftTntGamePlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new MadeByShotaTevdorashvili(), this);
 
         // Register TntArena with the protectionListener to its arguments
-        this.getCommand("tntarena").setExecutor(new TntArenaCommand(protectionListener, this));
+        this.getCommand("tntarena").setExecutor(new TntArenaCommand(protectionListener, this, this));
     }
 }

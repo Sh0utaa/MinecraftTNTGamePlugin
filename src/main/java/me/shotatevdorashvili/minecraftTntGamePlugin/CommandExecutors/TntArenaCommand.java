@@ -12,14 +12,17 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class TntArenaCommand implements CommandExecutor {
     private final ArenaProtectionListener protectionListener;
     private final Plugin plugin;
+    private final JavaPlugin javaPlugin;
 
-    public TntArenaCommand(ArenaProtectionListener protectionListener, Plugin plugin) {
+    public TntArenaCommand(ArenaProtectionListener protectionListener, Plugin plugin, JavaPlugin javaPlugin) {
         this.protectionListener = protectionListener;
         this.plugin = plugin;
+        this.javaPlugin = javaPlugin;
     }
 
     @Override
@@ -74,7 +77,7 @@ public class TntArenaCommand implements CommandExecutor {
         }
 
         ArenaBlockListener arenaBlockListener = new ArenaBlockListener(y, center, arenaSize - 2, height);
-        ArenaFillListener arenaFillListener = new ArenaFillListener(y, center, arenaSize - 2, height);
+        ArenaFillListener arenaFillListener = new ArenaFillListener(y, center, arenaSize - 2, height, javaPlugin);
         plugin.getServer().getPluginManager().registerEvents(arenaBlockListener, plugin);
         plugin.getServer().getPluginManager().registerEvents(arenaFillListener, plugin);
 
