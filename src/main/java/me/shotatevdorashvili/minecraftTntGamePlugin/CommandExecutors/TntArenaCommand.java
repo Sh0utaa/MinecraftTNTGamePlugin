@@ -1,14 +1,22 @@
 package me.shotatevdorashvili.minecraftTntGamePlugin.CommandExecutors;
 
+import me.shotatevdorashvili.minecraftTntGamePlugin.Listeners.ArenaProtectionListener;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class TntArenaCommand implements CommandExecutor {
+    private final ArenaProtectionListener protectionListener;
+
+    public TntArenaCommand(ArenaProtectionListener protectionListener) {
+        this.protectionListener = protectionListener;
+    }
+
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
@@ -21,7 +29,7 @@ public class TntArenaCommand implements CommandExecutor {
         World world = player.getWorld();
         Location center = player.getLocation();
 
-        int arenaSize = 17;
+        int arenaSize = 16;
         int height = 16;
         int borderThickness = 1;
 
@@ -35,12 +43,15 @@ public class TntArenaCommand implements CommandExecutor {
             for (int z = 0; z < arenaSize; z++) {
                 for (int dy = 0; dy < height; dy++) {
                     Location blockLocation = new Location(world, startX + x, y + dy, startZ + z);
+                    Block block = blockLocation.getBlock();
 
                     if (dy == 0) { // Floor layer
                         if (x == 0 || z == 0 || x == arenaSize - 1 || z == arenaSize - 1) {
                             blockLocation.getBlock().setType(Material.SEA_LANTERN); // Floor border
+                            protectionListener.addProtectedBlock(block); // Add to protected list
                         } else {
                             blockLocation.getBlock().setType(Material.SMOOTH_STONE); // Inner floor
+                            protectionListener.addProtectedBlock(block); // Add to protected list
                         }
                     } else { // Wall layers
                         if (x == 0 || z == 0 || x == arenaSize - 1 || z == arenaSize - 1) {
@@ -49,6 +60,7 @@ public class TntArenaCommand implements CommandExecutor {
                             } else {
                                 blockLocation.getBlock().setType(Material.WHITE_STAINED_GLASS); // Walls
                             }
+                            protectionListener.addProtectedBlock(block); // Add to protected list
                         }
                     }
                 }
