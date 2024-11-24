@@ -1,12 +1,12 @@
 package me.shotatevdorashvili.minecraftTntGamePlugin;
 
+import me.shotatevdorashvili.minecraftTntGamePlugin.CommandExecutors.TntArenaCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class MinecraftTntGamePlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // Plugin startup logic
-
+        this.getCommand("tntarena").setExecutor(new TntArenaCommand());
     }
 }

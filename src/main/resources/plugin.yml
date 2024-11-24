@@ -4,3 +4,7 @@ main: me.shotatevdorashvili.minecraftTntGamePlugin.MinecraftTntGamePlugin
 api-version: '1.21'
 authors: [ shota tevdorashvili ]
 description: this is my learning process of how to make minecraft plugins
+commands:
+  tntarena:
+    description: Creates a tntarena for tnt
+    usage: /tntarena
