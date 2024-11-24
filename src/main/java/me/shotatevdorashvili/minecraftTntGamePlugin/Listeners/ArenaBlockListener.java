@@ -51,8 +51,14 @@ public class ArenaBlockListener implements Listener {
 
     // Helper method to check if the block is inside the arena
     private boolean isInsideArena(Location blockLoc) {
-        return blockLoc.getX() >= arenaLocation.getX() && blockLoc.getX() < arenaLocation.getX() + arenaSize &&
-                blockLoc.getZ() >= arenaLocation.getZ() && blockLoc.getZ() < arenaLocation.getZ() + arenaSize &&
+
+        // Calculate the starting corner
+        int startX = arenaLocation.getBlockX() - (arenaSize / 2);
+        int startZ = arenaLocation.getBlockZ() - (arenaSize / 2);
+
+        // Check if the block is within the arena's boundaries
+        return blockLoc.getX() >= startX && blockLoc.getX() < startX + arenaSize &&
+                blockLoc.getZ() >= startZ && blockLoc.getZ() < startZ + arenaSize &&
                 blockLoc.getY() >= arenaBaseY && blockLoc.getY() < arenaBaseY + arenaHeight;
     }
 }
