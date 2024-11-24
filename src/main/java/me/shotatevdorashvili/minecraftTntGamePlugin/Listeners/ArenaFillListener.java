@@ -41,13 +41,14 @@ public class ArenaFillListener implements Listener {
         if (placedBlock.getY() == topY && isWithinArena(placedBlock.getLocation())) {
             if (isTopLayerFilled() && !countdownActive) {
                 Player player = event.getPlayer();
-                startCountdown(player, 5);  // Start countdown if not already running
+                startCountdown(player, 10);  // Start countdown if not already running
             }
         }
     }
 
     private void startCountdown(Player player, int countdownSeconds) {
         countdownActive = true;
+        player.playSound(player.getLocation(), Sound.BLOCK_VAULT_OPEN_SHUTTER, 1.0f, 1.0f);
 
         countdownTask = new BukkitRunnable() {
             int timeLeft = countdownSeconds;
