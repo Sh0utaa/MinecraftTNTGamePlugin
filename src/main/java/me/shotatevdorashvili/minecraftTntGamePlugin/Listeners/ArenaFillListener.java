@@ -1,18 +1,20 @@
 package me.shotatevdorashvili.minecraftTntGamePlugin.Listeners;
 
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.Sound;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.entity.EntityType;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
 
 public class ArenaFillListener implements Listener {
     private final int arenaBaseY;
@@ -70,9 +72,63 @@ public class ArenaFillListener implements Listener {
     }
 
     private void onCountdownComplete(Player player) {
-        player.sendMessage(ChatColor.GREEN + "Countdown Complete! Triggering function...");
-        player.sendTitle(ChatColor.GREEN + "Countdown Complete!", "", 0, 40, 20);
-        // Add your logic here for what happens when the countdown finishes
+        player.sendTitle(ChatColor.GOLD + "VICTORY!", "", 0, 50, 20);
+
+        // Calculate the starting corner for the arena
+        int startX = arenaLocation.getBlockX() - (arenaSize / 2);
+        int startZ = arenaLocation.getBlockZ() - (arenaSize / 2);
+        int endX = startX + arenaSize;
+        int endZ = startZ + arenaSize;
+        int topY = arenaBaseY + arenaHeight - 1; // The top layer Y-level
+
+        // Loop through each block inside the arena and set it to AIR
+        for (int x = startX; x < endX; x++) {
+            for (int z = startZ; z < endZ; z++) {
+                Location blockLoc = new Location(arenaLocation.getWorld(), x, topY, z);
+
+                // Check if the block is within the arena's top layer boundaries
+                if (isWithinArena(blockLoc)) {
+                    Block block = blockLoc.getBlock();
+
+                    // Create and launch the firework explosion effect at the block's location
+                    launchFirework(blockLoc);
+
+                    // Set the block to air after the effect
+                    block.setType(Material.AIR);
+                }
+
+                for (int y = arenaBaseY + 1; y <= topY; y++) {
+                    Location blockLoc2 = new Location(arenaLocation.getWorld(), x, y, z);
+
+                    // Check if the block is within the arena's boundaries
+                    if (isWithinArena(blockLoc2)) {
+                        Block block = blockLoc2.getBlock();
+                        block.setType(Material.AIR); // Set the block to air
+                    }
+                }
+            }
+        }
+    }
+
+
+    private void launchFirework(Location location) {
+        // Create a firework at the given location
+        Firework firework = (Firework) location.getWorld().spawnEntity(location, EntityType.FIREWORK_ROCKET);
+
+        // Get the firework's meta and set the effect
+        FireworkMeta meta = firework.getFireworkMeta();
+        FireworkEffect effect = FireworkEffect.builder()
+                .withColor(Color.RED, Color.GREEN) // Firework colors
+                .withFade(Color.BLUE) // Color fade after explosion
+                .with(FireworkEffect.Type.BALL) // Explosion type
+                .trail(true) // Add trail to the explosion
+                .flicker(true) // Add flicker to the explosion
+                .build();
+        meta.addEffect(effect);
+        firework.setFireworkMeta(meta);
+
+        // Optionally, set the firework to explode immediately
+        firework.detonate();
     }
 
     @EventHandler
