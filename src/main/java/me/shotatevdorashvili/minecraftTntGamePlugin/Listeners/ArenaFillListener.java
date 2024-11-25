@@ -180,7 +180,7 @@ public class ArenaFillListener implements Listener {
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     if (player.getLocation().distance(brokenBlock.getLocation()) < 50) { // Adjust range as needed
                         player.sendTitle(ChatColor.RED + "Canceled!", "", 0, 20, 0);
-                        player.playSound(player.getLocation(), Sound.BLOCK_VAULT_CLOSE_SHUTTER, 1.0f, 1.0f);
+                        player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.0f, 1.0f);
                     }
                 }
                 break; // No need to continue checking once one block is found
