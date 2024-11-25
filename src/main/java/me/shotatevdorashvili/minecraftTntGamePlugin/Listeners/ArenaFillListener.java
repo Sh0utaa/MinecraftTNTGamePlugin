@@ -44,14 +44,14 @@ public class ArenaFillListener implements Listener {
         if (placedBlock.getY() == topY && isWithinArena(placedBlock.getLocation())) {
             if (isTopLayerFilled() && !countdownActive) {
                 Player player = event.getPlayer();
-                startCountdown(player, 5);  // Start countdown if not already running
+                startCountdown(player, 15);  // Start countdown if not already running
             }
         }
     }
 
     private void startCountdown(Player player, int countdownSeconds) {
         countdownActive = true;
-        player.sendTitle(ChatColor.GREEN + "Countdown started", "", 0, 20, 0);
+        player.sendTitle(ChatColor.GREEN + "starting countdown...", "", 0, 20, 0);
         player.playSound(player.getLocation(), Sound.BLOCK_VAULT_OPEN_SHUTTER, 1.0f, 1.0f);
 
         countdownTask = new BukkitRunnable() {
@@ -151,16 +151,14 @@ public class ArenaFillListener implements Listener {
     public void onBlockBreak(BlockBreakEvent event) {
         Block brokenBlock = event.getBlock();
         int topY = arenaBaseY + arenaHeight - 1;
-        event.getPlayer().sendMessage("breakpoint: A block has been broken!");
 
         // Check if the broken block is part of the top layer and inside the arena
         if (countdownActive && brokenBlock.getY() == topY && isWithinArena(brokenBlock.getLocation())) {
-            event.getPlayer().sendMessage("breakpoint: Top block broken!");
 
             countdownTask.cancel();     // Cancel the countdown task
             countdownActive = false;    // Reset state
             event.getPlayer().sendTitle(ChatColor.RED + "Canceled!", "", 0, 20, 0);
-            event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_TRIAL_SPAWNER_BREAK, 1.5f, 1.5f);
+            event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.5f, 1.5f);
         }
     }
 

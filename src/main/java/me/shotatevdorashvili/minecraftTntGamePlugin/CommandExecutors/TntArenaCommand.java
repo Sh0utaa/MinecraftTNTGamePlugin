@@ -38,7 +38,7 @@ public class TntArenaCommand implements CommandExecutor {
         World world = player.getWorld();
         Location center = player.getLocation();
 
-        int arenaSize = 16;
+        int arenaSize = 14;
         int height = 17;
         int borderThickness = 1;
 
@@ -59,7 +59,7 @@ public class TntArenaCommand implements CommandExecutor {
                             blockLocation.getBlock().setType(Material.SEA_LANTERN); // Floor border
                             protectionListener.addProtectedBlock(block); // Add to protected list
                         } else {
-                            blockLocation.getBlock().setType(Material.SMOOTH_STONE); // Inner floor
+                            blockLocation.getBlock().setType(Material.QUARTZ_BRICKS); // Inner floor
                             protectionListener.addProtectedBlock(block); // Add to protected list
                         }
                     } else { // Wall layers

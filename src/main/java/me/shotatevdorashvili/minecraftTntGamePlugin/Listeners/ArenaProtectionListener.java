@@ -30,7 +30,6 @@ public class ArenaProtectionListener implements Listener {
         if (protectedBlocks.contains(block)) {
             if (!player.isOp()) {  // Allow only operators to break
                 event.setCancelled(true);
-                player.sendMessage("§cYou don't have permission to break this arena block!");
             }
         }
     }

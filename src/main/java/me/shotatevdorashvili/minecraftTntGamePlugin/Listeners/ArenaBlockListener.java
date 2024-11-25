@@ -32,7 +32,7 @@ public class ArenaBlockListener implements Listener {
 
             // Apply block material transformation based on Y-level
             if (y == arenaBaseY) {
-                newMaterial = Material.SMOOTH_STONE; // The base layer (floor)
+                newMaterial = Material.QUARTZ_BRICKS; // The base layer (floor)
             } else if (y < arenaBaseY + 5) {
                 newMaterial = Material.IRON_BLOCK; // First 4 blocks are Iron
             } else if (y < arenaBaseY + 9) {
