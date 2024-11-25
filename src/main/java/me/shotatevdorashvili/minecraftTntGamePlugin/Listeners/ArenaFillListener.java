@@ -158,7 +158,7 @@ public class ArenaFillListener implements Listener {
             countdownTask.cancel();     // Cancel the countdown task
             countdownActive = false;    // Reset state
             event.getPlayer().sendTitle(ChatColor.RED + "Canceled!", "", 0, 20, 0);
-            event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.5f, 1.5f);
+            event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_VAULT_CLOSE_SHUTTER, 1.5f, 1.5f);
         }
     }
 
@@ -179,8 +179,8 @@ public class ArenaFillListener implements Listener {
                 // Notify the nearest player (or you can loop through all players if needed)
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     if (player.getLocation().distance(brokenBlock.getLocation()) < 50) { // Adjust range as needed
-                        player.sendTitle(ChatColor.RED + "Canceled!", "", 0, 20, 0);
-                        player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.0f, 1.0f);
+                        player.sendTitle(ChatColor.RED + "canceled!", "", 0, 20, 0);
+                        player.playSound(player.getLocation(), Sound.BLOCK_VAULT_CLOSE_SHUTTER, 1.0f, 1.0f);
                     }
                 }
                 break; // No need to continue checking once one block is found
