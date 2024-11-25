@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -60,7 +61,7 @@ public class ArenaFillListener implements Listener {
             public void run() {
                 if (timeLeft > 0) {
                     // Display the main countdown (only for 4 seconds or above)
-                    if (timeLeft > 3) {
+                    if (timeLeft > 2) {
                         player.sendTitle(ChatColor.RED + "" + timeLeft + " sec", "", 0, 20, 0);
                         player.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, 1.0f, 1.0f);
                     }
@@ -95,23 +96,19 @@ public class ArenaFillListener implements Listener {
                     // Check if the block is within the arena's boundaries
                     if (isWithinArena(blockLoc)) {
                         Block block = blockLoc.getBlock();
-
-                        // Only trigger fireworks on every 4th layer
-                        if ((y - arenaBaseY) % 4 == 0) {
-                            launchFirework(blockLoc);  // Launch firework at this location
-                        }
-
                         block.setType(Material.AIR);  // Set the block to air
                     }
                 }
             }
         }
+
+        launchFirework(new Location(player.getLocation().getWorld(), player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ()));
     }
 
     // Nested countdown for 3, 2, and 1 seconds with 5-second intervals
     private void startNestedCountdown(Player player) {
         new BukkitRunnable() {
-            int timeLeft = 3;
+            int timeLeft = 2;
 
             @Override
             public void run() {
@@ -133,24 +130,23 @@ public class ArenaFillListener implements Listener {
 
 
     private void launchFirework(Location location) {
-        // Create a firework at the given location
+        // Spawn the firework entity
         Firework firework = (Firework) location.getWorld().spawnEntity(location, EntityType.FIREWORK_ROCKET);
 
-        // Get the firework's meta and set the effect
+        // Set up the firework effect with multiple colors and styles
         FireworkMeta meta = firework.getFireworkMeta();
         FireworkEffect effect = FireworkEffect.builder()
-                .withColor(Color.RED, Color.GREEN) // Firework colors
-                .withFade(Color.BLUE) // Color fade after explosion
-                .with(FireworkEffect.Type.BALL) // Explosion type
-                .trail(true) // Add trail to the explosion
+                .withColor(Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.PURPLE) // Multiple colors
+                .withFade(Color.ORANGE, Color.AQUA)  // Color fade after explosion
+                .with(FireworkEffect.Type.BALL_LARGE) // Larger explosion type
+                .trail(true)   // Add trail to the explosion
                 .flicker(true) // Add flicker to the explosion
                 .build();
         meta.addEffect(effect);
+        meta.setPower(2); // Adjust explosion height (2 is moderate)
         firework.setFireworkMeta(meta);
-
-        // Optionally, set the firework to explode immediately
-        firework.detonate();
     }
+
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
@@ -162,6 +158,33 @@ public class ArenaFillListener implements Listener {
             countdownTask.cancel();     // Cancel the countdown task
             countdownActive = false;    // Reset state
             event.getPlayer().sendTitle(ChatColor.RED + "Canceled!", "", 0, 20, 0);
+            event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_TRIAL_SPAWNER_BREAK, 1.5f, 1.5f);
+        }
+    }
+
+    @EventHandler
+    public void onExplosion(EntityExplodeEvent event) {
+        // Prevent blocks from dropping items
+        event.setYield(0);
+
+        // Check each block affected by the explosion
+        for (Block brokenBlock : event.blockList()) {
+            int topY = arenaBaseY + arenaHeight - 1;
+
+            // If any block on the top layer inside the arena is broken
+            if (countdownActive && brokenBlock.getY() == topY && isWithinArena(brokenBlock.getLocation())) {
+                countdownTask.cancel();     // Cancel the countdown task
+                countdownActive = false;    // Reset state
+
+                // Notify the nearest player (or you can loop through all players if needed)
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (player.getLocation().distance(brokenBlock.getLocation()) < 50) { // Adjust range as needed
+                        player.sendTitle(ChatColor.RED + "Canceled!", "", 0, 20, 0);
+                        player.playSound(player.getLocation(), Sound.BLOCK_VAULT_CLOSE_SHUTTER, 1.0f, 1.0f);
+                    }
+                }
+                break; // No need to continue checking once one block is found
+            }
         }
     }
 
