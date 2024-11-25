@@ -44,7 +44,7 @@ public class ArenaFillListener implements Listener {
         if (placedBlock.getY() == topY && isWithinArena(placedBlock.getLocation())) {
             if (isTopLayerFilled() && !countdownActive) {
                 Player player = event.getPlayer();
-                startCountdown(player, 10);  // Start countdown if not already running
+                startCountdown(player, 5);  // Start countdown if not already running
             }
         }
     }
@@ -70,7 +70,7 @@ public class ArenaFillListener implements Listener {
                 } else {
                     // Once the main countdown reaches zero, start the nested countdown for 3, 2, and 1 with a 5-second interval
                     startNestedCountdown(player);
-                    countdownActive = false;
+                    //countdownActive = false;
                     this.cancel(); // Stop the main countdown
                 }
             }
@@ -86,7 +86,6 @@ public class ArenaFillListener implements Listener {
         int endZ = startZ + arenaSize;
         int topY = arenaBaseY + arenaHeight - 1; // The top layer Y-level
 
-        // Loop through each block inside the arena and set it to AIR
         // Loop through each block inside the arena and set it to AIR
         for (int x = startX; x < endX; x++) {
             for (int z = startZ; z < endZ; z++) {
@@ -107,7 +106,7 @@ public class ArenaFillListener implements Listener {
 
     // Nested countdown for 3, 2, and 1 seconds with 5-second intervals
     private void startNestedCountdown(Player player) {
-        new BukkitRunnable() {
+        countdownTask = new BukkitRunnable() {
             int timeLeft = 2;
 
             @Override
@@ -143,7 +142,7 @@ public class ArenaFillListener implements Listener {
                 .flicker(true) // Add flicker to the explosion
                 .build();
         meta.addEffect(effect);
-        meta.setPower(2); // Adjust explosion height (2 is moderate)
+        meta.setPower(0); // Adjust explosion height
         firework.setFireworkMeta(meta);
     }
 
@@ -152,9 +151,12 @@ public class ArenaFillListener implements Listener {
     public void onBlockBreak(BlockBreakEvent event) {
         Block brokenBlock = event.getBlock();
         int topY = arenaBaseY + arenaHeight - 1;
+        event.getPlayer().sendMessage("breakpoint: A block has been broken!");
 
         // Check if the broken block is part of the top layer and inside the arena
         if (countdownActive && brokenBlock.getY() == topY && isWithinArena(brokenBlock.getLocation())) {
+            event.getPlayer().sendMessage("breakpoint: Top block broken!");
+
             countdownTask.cancel();     // Cancel the countdown task
             countdownActive = false;    // Reset state
             event.getPlayer().sendTitle(ChatColor.RED + "Canceled!", "", 0, 20, 0);
