@@ -50,6 +50,7 @@ public class ArenaFillListener implements Listener {
 
     private void startCountdown(Player player, int countdownSeconds) {
         countdownActive = true;
+        player.sendTitle(ChatColor.GREEN + "Countdown started", "", 0, 20, 0);
         player.playSound(player.getLocation(), Sound.BLOCK_VAULT_OPEN_SHUTTER, 1.0f, 1.0f);
 
         countdownTask = new BukkitRunnable() {
@@ -58,19 +59,22 @@ public class ArenaFillListener implements Listener {
             @Override
             public void run() {
                 if (timeLeft > 0) {
-                    player.sendTitle(ChatColor.RED + "" + timeLeft + " sec", "", 0, 20, 0);
-                    player.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, 1.0f, 1.0f);
+                    // Display the main countdown (only for 4 seconds or above)
+                    if (timeLeft > 3) {
+                        player.sendTitle(ChatColor.RED + "" + timeLeft + " sec", "", 0, 20, 0);
+                        player.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, 1.0f, 1.0f);
+                    }
+
                     timeLeft--;
                 } else {
-                    // Countdown reached zero, trigger action and cancel task
-                    onCountdownComplete(player);
+                    // Once the main countdown reaches zero, start the nested countdown for 3, 2, and 1 with a 5-second interval
+                    startNestedCountdown(player);
                     countdownActive = false;
-                    this.cancel();
+                    this.cancel(); // Stop the main countdown
                 }
             }
-        }.runTaskTimer(plugin, 0L, 20L); // Delay is 0 ticks, repeating every 20 ticks (1 second)
+        }.runTaskTimer(plugin, 20L, 20L); // Delay of 0 ticks, repeating every 20 ticks (1 second)
     }
-
     private void onCountdownComplete(Player player) {
         player.sendTitle(ChatColor.GOLD + "VICTORY!", "", 0, 50, 20);
 
@@ -82,32 +86,49 @@ public class ArenaFillListener implements Listener {
         int topY = arenaBaseY + arenaHeight - 1; // The top layer Y-level
 
         // Loop through each block inside the arena and set it to AIR
+        // Loop through each block inside the arena and set it to AIR
         for (int x = startX; x < endX; x++) {
             for (int z = startZ; z < endZ; z++) {
-                Location blockLoc = new Location(arenaLocation.getWorld(), x, topY, z);
-
-                // Check if the block is within the arena's top layer boundaries
-                if (isWithinArena(blockLoc)) {
-                    Block block = blockLoc.getBlock();
-
-                    // Create and launch the firework explosion effect at the block's location
-                    launchFirework(blockLoc);
-
-                    // Set the block to air after the effect
-                    block.setType(Material.AIR);
-                }
-
                 for (int y = arenaBaseY + 1; y <= topY; y++) {
-                    Location blockLoc2 = new Location(arenaLocation.getWorld(), x, y, z);
+                    Location blockLoc = new Location(arenaLocation.getWorld(), x, y, z);
 
                     // Check if the block is within the arena's boundaries
-                    if (isWithinArena(blockLoc2)) {
-                        Block block = blockLoc2.getBlock();
-                        block.setType(Material.AIR); // Set the block to air
+                    if (isWithinArena(blockLoc)) {
+                        Block block = blockLoc.getBlock();
+
+                        // Only trigger fireworks on every 4th layer
+                        if ((y - arenaBaseY) % 4 == 0) {
+                            launchFirework(blockLoc);  // Launch firework at this location
+                        }
+
+                        block.setType(Material.AIR);  // Set the block to air
                     }
                 }
             }
         }
+    }
+
+    // Nested countdown for 3, 2, and 1 seconds with 5-second intervals
+    private void startNestedCountdown(Player player) {
+        new BukkitRunnable() {
+            int timeLeft = 3;
+
+            @Override
+            public void run() {
+                if (timeLeft >= 1) {
+                    player.sendTitle(ChatColor.RED + "" + timeLeft + " sec", "", 0, 20, 20);
+                    player.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, 1.0f, 1.0f);
+                    timeLeft--;
+
+
+                } else if (timeLeft == 0) {
+                    // Once the countdown reaches zero, trigger onCountdownComplete and stop the countdown
+                    onCountdownComplete(player);
+                    countdownActive = false;
+                    this.cancel(); // Cancel the nested countdown
+                }
+            }
+        }.runTaskTimer(plugin, 0L, 60L); // Delay of 60 ticks (3 seconds) between each nested countdown
     }
 
 
