@@ -157,7 +157,7 @@ public class ArenaFillListener implements Listener {
 
             countdownTask.cancel();     // Cancel the countdown task
             countdownActive = false;    // Reset state
-            event.getPlayer().sendTitle(ChatColor.RED + "Canceled!", "", 0, 20, 0);
+            event.getPlayer().sendTitle(ChatColor.RED + "canceled!", "", 0, 20, 0);
             event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_VAULT_CLOSE_SHUTTER, 1.5f, 1.5f);
         }
     }
